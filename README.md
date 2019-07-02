@@ -1,3 +1,3 @@
-# Filtro FIR passa-baixas
+# Low-Pass FIR FIlter
 
 *Projeto em desenvolvimento.*
