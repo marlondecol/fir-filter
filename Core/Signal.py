@@ -1,4 +1,6 @@
 from os import path, sep
+from scipy.fftpack import fft
+from scipy.signal import firwin
 from tkinter import Tk, filedialog as fd
 import numpy as np
 
@@ -20,6 +22,8 @@ class Signal:
 		# Atributos específicos.
 		self.data = None
 		self.file = None
+		self.order = None
+		self.samplefreq = None
 
 		# Diretório inicial para os diálogos.
 		self.initialdir = self.signalsdir(initialdir)
@@ -42,6 +46,9 @@ class Signal:
 		
 		# Faz a convolução dos sinais.
 		self.data = np.convolve(a.data, v.data)
+
+		self.order = a.order
+		self.samplefreq = a.samplefreq
 		
 		# Abre uma janela de diálogo para escolher onde salvar o arquivo do sinal resultante.
 		outfile = fd.asksaveasfilename(initialdir=self.initialdir, title=asktitle, filetypes=[[asktype, self.fileformat]])
@@ -60,6 +67,20 @@ class Signal:
 		self.file = outfile
 
 		return self.data
+	
+	# Aplica a série de Fourier ao sinal.
+	def fftbysignal(self, signal):
+		self.data = fft(signal.data)
+
+		self.order = signal.order
+		self.samplefreq = signal.samplefreq
+	
+	# Gera um filtro FIR parametrizados.
+	def genfir(self, samplefreq, cutfreq, order, filtertype, window):
+		self.data = firwin(order, cutfreq, fs=samplefreq, window=window, pass_zero=filtertype)
+
+		self.order = order
+		self.samplefreq = samplefreq
 	
 	# Abre uma janela de diálogo para carregar o sinal de um arquivo e retorna seus dados.
 	def load(self, asktitle, asktype="Arquivos de texto", askallfiles=True, dtype=float, delimiter="\n"):
@@ -81,6 +102,8 @@ class Signal:
 		
 		# Carrega os dados do arquivo.
 		self.data = np.loadtxt(infile, dtype=dtype, delimiter=delimiter)
+		self.order = len(self.data)
+
 		self.file = infile
 
 		return self.data
