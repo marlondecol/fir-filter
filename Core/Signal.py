@@ -45,9 +45,9 @@ class Signal:
 			raise SignalDataNotDefinedError(v)
 		
 		# Faz a convolução dos sinais.
-		self.data = np.convolve(a.data, v.data)
+		self.data = np.convolve(a.data, v.data[len(v.data) // 2:])
 
-		self.order = a.order
+		self.order = a.order // 2
 		self.samplefreq = a.samplefreq
 		
 		# Abre uma janela de diálogo para escolher onde salvar o arquivo do sinal resultante.
@@ -76,11 +76,29 @@ class Signal:
 		self.samplefreq = signal.samplefreq
 	
 	# Gera um filtro FIR parametrizados.
-	def genfir(self, samplefreq, cutfreq, order, filtertype, window):
+	def genfir(self, samplefreq, cutfreq, order, filtertype, window, asktitle, asktype="Arquivo de texto"):
 		self.data = firwin(order, cutfreq, fs=samplefreq, window=window, pass_zero=filtertype)
 
 		self.order = order
 		self.samplefreq = samplefreq
+		
+		# Abre uma janela de diálogo para escolher onde salvar o arquivo do sinal resultante.
+		outfile = fd.asksaveasfilename(initialdir=self.initialdir, title=asktitle, filetypes=[[asktype, self.fileformat]])
+
+		# Se o usuário cancelou o salvamento.
+		if not outfile:
+			raise SavingCanceledError()
+		
+		# Salva o arquivo do sinal resultante.
+		np.savetxt(outfile, self.data)
+
+		# Verifica se o arquivo foi realmente salvo.
+		if not path.isfile(outfile):
+			raise SignalFileNotSavedError()
+		
+		self.file = outfile
+
+		return self.data
 	
 	# Abre uma janela de diálogo para carregar o sinal de um arquivo e retorna seus dados.
 	def load(self, asktitle, asktype="Arquivos de texto", askallfiles=True, dtype=float, delimiter="\n"):

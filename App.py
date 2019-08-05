@@ -130,8 +130,14 @@ def genlowpass(plotter):
 		if order < 0:
 			raise ValueError()
 		
+		clear()
+
+		message = "Selecione um arquivo para salvar o sinal de filtro h[n]"
+
+		luprint(message + "...", end="")
+		
 		fir = Signal("Sinal de filtro h[n]", "blue")
-		fir.genfir(samplefreq, cutfreq, order, "lowpass", "blackmanharris")
+		fir.genfir(samplefreq, cutfreq, order, "lowpass", "blackmanharris", message)
 
 		firfft = Signal("Série de Fourier do sinal de filtro h[n]", "blue")
 		firfft.fftbysignal(fir)
@@ -165,6 +171,15 @@ def genlowpass(plotter):
 		clear()
 		luprint("Erro ao plotar o sinal!")
 		lprint("Nenhum sinal foi adicionado ao plotter.")
+	# Salvamento cancelado.
+	except SavingCanceledError as e:
+		clear()
+		luprint("Salvamento cancelado!")
+	# Arquivo não foi salvo.
+	except SignalFileNotSavedError as e:
+		clear()
+		luprint("Erro ao gerar o filtro!")
+		lprint("O arquivo do sinal de filtro não pôde ser salvo.")
 	# Sinal não adicionado.
 	except SignalNotExistError as e:
 		clear()
@@ -212,8 +227,14 @@ def genbandpass(plotter):
 		if order < 0:
 			raise ValueError()
 		
+		clear()
+
+		message = "Selecione um arquivo para salvar o sinal de filtro h[n]"
+
+		luprint(message + "...", end="")
+		
 		fir = Signal("Sinal de filtro h[n]", "blue")
-		fir.genfir(samplefreq, [cutfreq1, cutfreq2], order, "bandpass", "blackmanharris")
+		fir.genfir(samplefreq, [cutfreq1, cutfreq2], order, "bandpass", "blackmanharris", message)
 
 		firfft = Signal("Série de Fourier do sinal de filtro h[n]", "blue")
 		firfft.fftbysignal(fir)
@@ -247,6 +268,15 @@ def genbandpass(plotter):
 		clear()
 		luprint("Erro ao plotar o sinal!")
 		lprint("Nenhum sinal foi adicionado ao plotter.")
+	# Salvamento cancelado.
+	except SavingCanceledError as e:
+		clear()
+		luprint("Salvamento cancelado!")
+	# Arquivo não foi salvo.
+	except SignalFileNotSavedError as e:
+		clear()
+		luprint("Erro ao gerar o filtro!")
+		lprint("O arquivo do sinal de filtro não pôde ser salvo.")
 	# Sinal não adicionado.
 	except SignalNotExistError as e:
 		clear()
